@@ -2,8 +2,7 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import jwt from 'jsonwebtoken';
-import UserModel  from '../models/users';
-import { IUser } from '../interfaces/userInterface';
+import UserModel, { IUser } from '../models/users';
 
 dotenv.config();
 
@@ -17,9 +16,9 @@ interface ISerializedUser {
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.client_id || '',
-      clientSecret: process.env.client_secret || '',
-      callbackURL: process.env.redirect_uris || '',
+      clientID: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+      callbackURL: process.env.GOOGLE_CALLBACK_URL || '',
     },
     async (accessToken: string, refreshToken: string, profile: Profile, done) => {
       try {

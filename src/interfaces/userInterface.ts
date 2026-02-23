@@ -1,20 +1,6 @@
 import {  Document} from 'mongoose';
 
-export interface IUser extends Document {
-    fname: string;
-    lname: string;
-    email: string;
-    pass?: string;
-    role?: string;
-    gender?: string;
-    googleId?: string;
-    passwordChangedAt?: Date;
-    lastLoginAt?: Date;
-    mobilenumber: string;
-    resetPasswordOtp?: string;
-    otpExpires?: Date;
-    refreshToken?: string;
-};
+
 
 // Define the payload for JWT tokens
 export interface IJwtPayload {

@@ -1,9 +1,11 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
-import { IUser } from '../interfaces/userInterface';
+import { IUser } from '../models/users';
 
 const router = Router();
-
+interface CustomRequest extends Request {
+  userId?: string;
+}
 /* ==============================
    OAuth Sign Page
 ============================== */
@@ -31,7 +33,7 @@ router.get(
 router.get(
   '/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
-  (req: Request, res: Response) => {
+  (req: CustomRequest, res: Response) => {
     const usersInfo:{ user: IUser, token: string } | null = req.user as any;
     if (!usersInfo) {
       return res.status(401).json({ message: 'Authentication failed' });
@@ -51,7 +53,7 @@ router.get(
     return res.status(200).json({
       message: 'Login Successfully',
       user: {
-        u_id: user._id,
+        u_id: req.userId,
         email: user.email,
         fname: user.fname,
         lname: user.lname,

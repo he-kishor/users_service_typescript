@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
-import UserModel from '../models/users';
-import { IUser,IForgotPasswordResponse, IResetPasswordRequest } from '../interfaces/userInterface';
+import UserModel , {IUser} from '../models/users';
+import {  IForgotPasswordResponse,IResetPasswordRequest } from '../interfaces/userInterface';
 
 dotenv.config();
 

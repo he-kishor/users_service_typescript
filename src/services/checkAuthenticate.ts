@@ -1,9 +1,9 @@
-import UserModel  from '../models/users';
+import UserModel , {IUser} from '../models/users';
 import { 
     ILoginRequest, 
     ILoginResponse, 
     IJwtPayload, 
-    IUser
+   
  } from '../interfaces/userInterface';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -16,17 +16,18 @@ dotenv.config();
 const check_user = async (uid: string): Promise<Partial<IUser>> => {
   const user_data = await UserModel.findById(uid);
 
-  // Handle if user is not found
   if (!user_data) {
     throw { status: 400, message: 'User does not exist' };
   }
 
-  // Return the user data if `pass` is not present
-  if (!user_data.pass) {
-    return user_data.toObject();
+  // Convert to plain object and cast to IUser to satisfy the return type
+  const userPlainObject = user_data.toObject() as IUser; 
+
+  if (!userPlainObject.pass) {
+    return userPlainObject;
   }
 
-  const userPlainObject = user_data.toObject(); // Convert Mongoose document to plain object
+  // Manually remove sensitive fields
   delete userPlainObject.pass;
   delete userPlainObject.passwordChangedAt;
   delete userPlainObject.otpExpires;
@@ -35,7 +36,6 @@ const check_user = async (uid: string): Promise<Partial<IUser>> => {
 
   return userPlainObject;
 };
-
 // Function to handle user login
 const loginuser = async ({ email, pass }: ILoginRequest): Promise<ILoginResponse> => {
   const user = await UserModel.findOne({ email });

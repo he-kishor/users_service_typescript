@@ -7,6 +7,10 @@ if (!JWT_SECRET) {
   throw new Error('JWT_SECRET is not defined in environment variables');
 }
 
+interface CustomRequest extends Request {
+  userId?: string;
+}
+
 interface CustomJwtPayload extends JwtPayload {
   id: string;
 }
@@ -16,7 +20,7 @@ interface CustomJwtPayload extends JwtPayload {
 ================================ */
 
 export const authenticate = (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ): Response | void => {
@@ -43,7 +47,7 @@ export const authenticate = (
 ================================ */
 
 export const authenticateHeader = (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ): Response | void => {
@@ -70,7 +74,7 @@ export const authenticateHeader = (
 ================================ */
 
 export const verifyAccessToken = (
-  req: Request,
+  req: CustomRequest,
   res: Response,
   next: NextFunction
 ): Response | void => {

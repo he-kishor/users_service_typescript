@@ -1,18 +1,21 @@
 import { Request, Response } from 'express';
-import errorHandler from '../../../Shared/errorHandler';
-import { check_user, loginuser } from '../services/check_authenticate';
+import errorHandler from '../utils/errorHandler';
+import { check_user, loginuser } from '../services/checkAuthenticate';
+import { IUser } from '../models/users';
 
 /* =================================
    Check Logged-in User
 ================================= */
+interface CustomRequest extends Request {
+  userId?: string;
+}
 
 export const checkUserController = async (
-  req: Request,
+  req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
-    const body = req.body as Partial<IUser>;
-    const id = body._id;
+    const id = req.userId;
 
     if (!id) {
       res.status(401).json({ message: 'Unauthorized' });

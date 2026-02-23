@@ -1,12 +1,13 @@
 import { Router } from 'express';
+import userRoute from '../routes/users';
+import oauthRoute from '../routes/oath2';
 
 const router = Router();
 
-// Define your routes here
-router.get('/example', (req, res) => {
-    res.send('This is an example route');
-});
 
-// Add more routes as needed
+router.use('/users', userRoute); // All /users-related routes will be forwarded to the user microservice
+router.use('/oauth2',oauthRoute); // All /oauth2-related routes will be forwarded to the oauth microservice
+module.exports = router;
+
 
 export default router;

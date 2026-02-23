@@ -1,5 +1,5 @@
-import UserModel from '../models/users';
-import { IUser } from '../interfaces/userInterface';
+import UserModel , {IUser} from '../models/users';
+
 
 // Define the response structure for the update mobile number function
 interface IUpdateMobileNumberResponse {

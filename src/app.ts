@@ -7,7 +7,7 @@ import session from 'express-session';
 import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import './services/passport';
+import passportData from './services/passport';
 import dotenv from 'dotenv';
 
 dotenv.config();

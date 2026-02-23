@@ -1,8 +1,24 @@
-import mongoose, { Schema, Document, Model } from 'mongoose';
-import {IUser} from '../interfaces/userInterface';
+import mongoose, { model,Schema,Model } from 'mongoose';
 
-// Define the schema for the User model
-const UserSchema: Schema<IUser> = new Schema(
+export interface IUser {
+  fname: string;
+  lname: string;
+  email: string;
+  // Added '| null' to handle database nulls and fix the assignment error
+  pass?: string | null; 
+  role?: string | null;
+  gender?: string | null;
+  passwordChangedAt?: Date | null;
+  lastLoginAt?: Date | null;
+  googleId?: string | null;
+  mobilenumber?: string | null;
+  resetPasswordOtp?: string | null;
+  otpExpires?: Date | null;
+  refreshToken?: string | null;
+}
+
+// 1. Pass <IUser> to the Schema constructor
+const userSchema = new Schema<IUser>(
   {
     fname: { type: String, required: true },
     lname: { type: String, required: true },
@@ -13,24 +29,15 @@ const UserSchema: Schema<IUser> = new Schema(
     passwordChangedAt: { type: Date },
     lastLoginAt: { type: Date },
     googleId: { type: String },
-    mobilenumber: {
-      type: String,
-      unique: true,
-      validate: {
-        validator: function (v: string): boolean {
-          return /^\+[1-9]\d{1,1}\d{10}$/.test(v); // Basic E.164 format validation
-        },
-        message: (props: { value: string }) => `${props.value} is not a valid phone number!`,
-      },
-    },
+    mobilenumber: { type: String },
     resetPasswordOtp: { type: String },
     otpExpires: { type: Date },
-    refreshToken: { type: String },
-  },
-  { timestamps: true } // Automatically adds createdAt and updatedAt fields
+    refreshToken: { type: String }
+  }
 );
 
-// Create the User model
-const UserModel: Model<IUser> = mongoose.model<IUser>('Users_main', UserSchema);
+// 2. Explicitly type the Model to stop the "deep instantiation" error
+
+const UserModel:Model<IUser>= model<IUser>('User', userSchema);
 
 export default UserModel;

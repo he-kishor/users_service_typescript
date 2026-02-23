@@ -11,9 +11,13 @@ import {
 } from '../services/forgotPassword';
 import { update_mobilenumber } from '../services/mobileNumberService';
 
-import {IUser} from '../interfaces/userInterface';
+import { IUser } from '../models/users';
 import errorHandler from '../utils/errorHandler';
+import { CorsRequest } from 'cors';
 
+interface CustomRequest extends Request {
+  userId?: string;
+}
 /* =================================
    User Register
 ================================= */
@@ -63,12 +67,11 @@ export const loginUserController = async (
 ================================= */
 
 export const updateUserController = async (
-  req: Request,
+  req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
-    const body = req.body as Partial<IUser>;
-    const id = body._id;
+    const id = req.userId;
 
     if (!id) {
       res.status(401).json({ message: 'Unauthorized' });
@@ -88,12 +91,11 @@ export const updateUserController = async (
 ================================= */
 
 export const updatePasswordController = async (
-  req: Request,
+  req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
-    const body = req.body as Partial<IUser>;
-    const id = body._id;
+    const id = req.userId;
 
     if (!id) {
       res.status(401).json({ message: 'Unauthorized' });
@@ -161,7 +163,7 @@ export const resetPasswordController = async (
 ================================= */
 
 export const updateMobileNumberController = async (
-  req: Request,
+  req: CustomRequest,
   res: Response
 ): Promise<void> => {
   try {
@@ -172,8 +174,7 @@ export const updateMobileNumberController = async (
       return;
     }
 
-    const body = req.body as Partial<IUser>;
-    const id:string = body._id;
+    const id = req.userId;
 
     if (!id) {
       res.status(401).json({ message: 'Unauthorized' });

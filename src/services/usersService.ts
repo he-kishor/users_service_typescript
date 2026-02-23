@@ -1,8 +1,7 @@
 import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { IUser } from '../interfaces/userInterface';
-import UserModel from '../models/users';
+import UserModel , { IUser } from '../models/users';
 import { Types } from 'mongoose';
 
 dotenv.config();
@@ -86,6 +85,8 @@ export const loginUser = async ({ email, pass }: LoginInput) => {
     process.env.JWT_SECRET as string,
     { expiresIn: '4h' }
   );
+
+  
 
   const refreshToken = jwt.sign(
     { id: user._id },
