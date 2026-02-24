@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import logger from '../utils/logger';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import UserModel , { IUser } from '../models/users';
@@ -30,6 +31,7 @@ export const registerUser = async ({
   mobilenumber
 }: RegisterInput) => {
   if (!fname || !lname || !email || !pass || !mobilenumber) {
+    logger.warn(`User registration attempt with missing fields: ${JSON.stringify({ fname, lname, email, pass, mobilenumber })}`);
     throw { status: 400, message: 'Please provide all required fields' };
   }
 
@@ -71,12 +73,14 @@ export const loginUser = async ({ email, pass }: LoginInput) => {
   const user = await UserModel.findOne({ email });
 
   if (!user) {
+    logger.warn(`Login attempt with invalid email: ${email}`);
     throw { status: 400, message: 'Invalid EmailID' };
   }
 
   const isPasswordValid = await bcrypt.compare(pass, user.pass as string);
 
   if (!isPasswordValid) {
+    logger.warn(`Login attempt with invalid password for email: ${email}`);
     throw { status: 400, message: 'Invalid User' };
   }
 
@@ -106,6 +110,7 @@ export const loginUser = async ({ email, pass }: LoginInput) => {
   );
 
   if (!updatedUser) {
+    logger.error(`Failed to update user details for user ID: ${user._id} after login`);
     throw { status: 400, message: 'User update failed' };
   }
 
@@ -142,6 +147,7 @@ export const updateUser = async (
   const { email, fname, lname, gender } = body;
 
   if (!email || !fname || !lname || !gender) {
+    logger.warn(`User update attempt with missing fields for user ID: ${id}: ${JSON.stringify({ email, fname, lname, gender })}`);
     throw {
       status: 400,
       message: 'All fields (email, fname, lname, gender) must be provided'
@@ -157,6 +163,7 @@ export const updateUser = async (
   );
 
   if (!updatedUser) {
+    logger.warn(`User update attempt for non-existent user ID: ${id}`);
     throw { status: 404, message: 'User not found' };
   }
 
@@ -185,6 +192,7 @@ export const updatePassword = async (
   { email, old_pass, new_pass }: UpdatePasswordInput
 ) => {
   if (!email || !old_pass || !new_pass) {
+    logger.warn(`Password update attempt with missing fields for user ID: ${id}: ${JSON.stringify({ email, old_pass, new_pass })}`);
     throw {
       status: 400,
       message: 'All fields (email, old pass, new pass) must be provided'
@@ -192,6 +200,7 @@ export const updatePassword = async (
   }
 
   if (old_pass === new_pass) {
+    logger.warn(`Password update attempt with same old and new password for user ID: ${id}`);
     throw {
       status: 400,
       message: 'New password must be different from old password'
@@ -201,12 +210,14 @@ export const updatePassword = async (
   const user = await UserModel.findById(id);
 
   if (!user) {
+    logger.warn(`Password update attempt for non-existent user ID: ${id}`);
     throw { status: 400, message: 'Invalid User' };
   }
 
   const isValid = await bcrypt.compare(old_pass, user.pass as string);
 
   if (!isValid) {
+    logger.warn(`Password update attempt with incorrect old password for user ID: ${id}`);
     throw { status: 401, message: 'Incorrect password' };
   }
 

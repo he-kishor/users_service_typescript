@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
+import logger from '../utils/logger';
 import { IUser } from '../models/users';
 
 const router = Router();
@@ -36,9 +37,10 @@ router.get(
   (req: CustomRequest, res: Response) => {
     const usersInfo:{ user: IUser, token: string } | null = req.user as any;
     if (!usersInfo) {
+      logger.warn('Authentication failed: No user information found in request');
       return res.status(401).json({ message: 'Authentication failed' });
     }
-
+    
     const { user, token } = usersInfo;
 
     const maxAge = 24 * 60 * 60 * 1000;
@@ -49,7 +51,8 @@ router.get(
       sameSite: 'strict',
       maxAge
     });
-
+    
+    logger.info(`User ${user.email} authenticated successfully with Google OAuth`);
     return res.status(200).json({
       message: 'Login Successfully',
       user: {

@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
+import logger from '../utils/logger';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 if (!JWT_SECRET) {
+  logger.error('JWT_SECRET is not defined in environment variables');
   throw new Error('JWT_SECRET is not defined in environment variables');
 }
 
@@ -27,6 +29,7 @@ export const authenticate = (
   const token = req.cookies?.authToken;
 
   if (!token) {
+    logger.warn('Unauthorized access attempt: No auth token found in cookies');
     return res.status(401).json({ message: 'Access Denied' });
   }
 
@@ -38,6 +41,7 @@ export const authenticate = (
 
     next();
   } catch (error) {
+    logger.error(`Token verification failed:${error}`);
     return res.status(403).json({ message: 'Invalid token' });
   }
 };
@@ -55,6 +59,7 @@ export const authenticateHeader = (
   const token = authHeader?.split(' ')[1];
 
   if (!token) {
+    logger.info('Unauthorized access attempt: No auth token found in Authorization header');
     return res.status(401).json({ message: 'Access Denied' });
   }
 
@@ -65,6 +70,7 @@ export const authenticateHeader = (
 
     next();
   } catch (error) {
+    logger.error(`Token verification failed:${error}`);
     return res.status(403).json({ message: 'Invalid token' });
   }
 };
@@ -78,9 +84,11 @@ export const verifyAccessToken = (
   res: Response,
   next: NextFunction
 ): Response | void => {
+
   const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
+    logger.warn('Unauthorized access attempt: No access token found in Authorization header');
     return res.status(401).json({ message: 'Access token missing' });
   }
 
@@ -91,6 +99,7 @@ export const verifyAccessToken = (
 
     next();
   } catch (error) {
+    logger.error(`Access token verification failed:${error}`);
     return res
       .status(403)
       .json({ message: 'Invalid or expired access token' });
@@ -101,11 +110,11 @@ export const verifyAccessToken = (
    Logger Middleware
 ================================ */
 
-export const logger = (
+export const loggerr = (
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
-  console.log(`Logger: ${req.method} request received on ${req.url}`);
+  logger.info(`Incoming request: ${req.method} ${req.url}`);
   next();
 };

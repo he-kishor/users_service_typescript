@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
+import logger from './utils/logger';
+
 import express from 'express';
 import passport from 'passport';
 import './config/passport';        // ✅ keep only if this re-exports from services/passport
 import { connectDB } from './db/dbconnect';
 import Routes from './routes/route';
-import { logger } from './middlewares/middleware';
+import { loggerr } from './middlewares/middleware';
 import session from 'express-session';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -16,7 +18,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(logger);
+app.use(loggerr);
 app.use(cookieParser());
 
 const allowedOrigins = [
@@ -63,6 +65,6 @@ const PORT = process.env.PORT || 3003;
 // Connect to the database and then start the server
 connectDB().then(() => {
   app.listen(PORT, () => {
-    console.log(`The server is running on the port ${PORT}`);
+    logger.info(`The server is running on the port ${PORT}`);
   });
 });

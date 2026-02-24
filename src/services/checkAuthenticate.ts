@@ -1,4 +1,5 @@
 import UserModel , {IUser} from '../models/users';
+import logger from '../utils/logger';
 import { 
     ILoginRequest, 
     ILoginResponse, 
@@ -17,6 +18,7 @@ const check_user = async (uid: string): Promise<Partial<IUser>> => {
   const user_data = await UserModel.findById(uid);
 
   if (!user_data) {
+    logger.warn(`User with ID ${uid} does not exist`);
     throw { status: 400, message: 'User does not exist' };
   }
 
@@ -24,6 +26,7 @@ const check_user = async (uid: string): Promise<Partial<IUser>> => {
   const userPlainObject = user_data.toObject() as IUser; 
 
   if (!userPlainObject.pass) {
+    logger.warn(`User with ID ${uid} has no password set, likely a social login user`);
     return userPlainObject;
   }
 
@@ -40,12 +43,14 @@ const check_user = async (uid: string): Promise<Partial<IUser>> => {
 const loginuser = async ({ email, pass }: ILoginRequest): Promise<ILoginResponse> => {
   const user = await UserModel.findOne({ email });
   if (!user) {
+    logger.warn(`Login attempt with invalid email: ${email}`);
     throw { status: 400, message: 'Invalid EmailID' };
   }
 
   // Validate hashed password
   const ispasswordValid = await bcrypt.compare(pass, user.pass || '');
   if (!ispasswordValid) {
+    logger.warn(`Login attempt with invalid password for email: ${email}`);
     throw { status: 400, message: 'Invalid User' };
   }
 
@@ -76,6 +81,7 @@ const loginuser = async ({ email, pass }: ILoginRequest): Promise<ILoginResponse
   );
 
   if (!user_up) {
+    logger.error(`Failed to update user details for user ID: ${user.id}`);
     throw { status: 500, message: 'Failed to update user details' };
   }
 

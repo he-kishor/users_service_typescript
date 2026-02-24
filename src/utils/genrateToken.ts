@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import logger from './logger';
 import { Types } from 'mongoose';
 
 interface IUserTokenPayload {
@@ -14,6 +15,7 @@ interface JwtPayload {
 
 const generateToken = (user: IUserTokenPayload): string => {
   if (!process.env.JWT_SECRET_TOKEN) {
+    logger.error('JWT secret is not defined in environment variables');
     throw new Error('JWT secret is not defined');
   }
 

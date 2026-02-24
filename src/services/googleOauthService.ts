@@ -1,4 +1,5 @@
 import passport from 'passport';
+import logger from '../utils/logger';
 import { Strategy as GoogleStrategy, VerifyCallback,Profile } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 
@@ -31,6 +32,7 @@ passport.use(
         // Call the `done` callback with the user object
         return done(null, user);
       } catch (error) {
+        logger.error(`Error during Google OAuth authentication:${error}`);
         // Call the `done` callback with the error
         return done(error);
       }

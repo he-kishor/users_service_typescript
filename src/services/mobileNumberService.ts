@@ -1,4 +1,5 @@
 import UserModel , {IUser} from '../models/users';
+import logger from '../utils/logger';
 
 
 // Define the response structure for the update mobile number function
@@ -12,12 +13,14 @@ const update_mobilenumber = async (_id: string, mobilenumber: string): Promise<I
   const isValidFormat = /^\+[1-9]\d{0,1}\d{10}$/.test(mobilenumber);
 
   if (!isValidFormat) {
+    logger.warn(`Invalid mobile number format attempt for user ID: ${_id} with number: ${mobilenumber}`);
     throw { status: 400, message: 'Invalid mobile number format' };
   }
 
   // Step 2: Find user by ID
   const user = await UserModel.findOne({ _id: _id });
   if (!user) {
+    logger.warn(`Mobile number update attempt for non-existent user ID: ${_id}`);
     throw { status: 401, message: 'Invalid User' };
   }
 
@@ -30,15 +33,18 @@ const update_mobilenumber = async (_id: string, mobilenumber: string): Promise<I
     );
 
     if (!updatedUser) {
+      logger.error(`Failed to update mobile number for user ID: ${_id}`);
       throw { status: 500, message: 'Failed to update mobile number' };
     }
 
     return { message: 'Number has been updated' };
   } catch (error: any) {
     if (error.name === 'ValidationError') {
+      logger.warn(`Validation error while updating mobile number for user ID: ${_id} with number: ${mobilenumber}: ${error.message}`);
       throw { status: 400, message: 'Invalid mobile number format' };
     } else {
-      console.error('Internal server error:', error); // Log the error for debugging
+
+      logger.error(`Internal server error:${error}`); // Log the error for debugging
       throw { status: 500, message: 'An internal error has occurred' };
     }
   }

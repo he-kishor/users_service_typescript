@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
+import logger from '../utils/logger';
 import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import UserModel , {IUser} from '../models/users';
 import {  IForgotPasswordResponse,IResetPasswordRequest } from '../interfaces/userInterface';
+import { loggerr } from '../middlewares/middleware';
 
 dotenv.config();
 
@@ -12,6 +14,7 @@ dotenv.config();
 const user_forgotpassword = async (email: string): Promise<IForgotPasswordResponse> => {
   const get_users = await UserModel.findOne({ email });
   if (!get_users) {
+    logger.warn(`Forgot password attempt with non-existent email: ${email}`);
     throw { status: 400, message: 'User does not exist' };
   }
 
@@ -31,6 +34,7 @@ const user_forgotpassword = async (email: string): Promise<IForgotPasswordRespon
   );
 
   if (!users_updated) {
+    logger.error(`Failed to update user with OTP for email: ${email}`);
     throw { status: 500, message: 'Failed to update user with OTP' };
   }
 
@@ -57,8 +61,10 @@ const user_forgotpassword = async (email: string): Promise<IForgotPasswordRespon
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        logger.error(`Error sending OTP email to ${email}:${error}`);
         return reject({ status: 500, message: 'Issue while sending OTP', error });
       } else {
+        logger.info(`OTP email sent successfully to ${email}: ${info.response}`);
         return resolve({ data: `Your OTP has been sent to your email` });
       }
     });
@@ -74,22 +80,26 @@ const user_resetPassword = async ({
 }: IResetPasswordRequest): Promise<{ message: string }> => {
   // Check for required parameters
   if (!email || !new_password || !confirm_password || !otp) {
+    logger.info('Reset password attempt with missing parameters');
     throw { status: 400, message: 'User must provide email, new_password, confirm_password, and OTP' };
   }
 
   // Check if new_password and confirm_password match
   if (new_password !== confirm_password) {
+    logger.warn(`Password mismatch for email: ${email}`);
     throw { status: 400, message: 'Password does not match with confirmation' };
   }
 
   // Find the user by email
   const user = await UserModel.findOne({ email });
   if (!user) {
+    logger.warn(`Password reset attempt with non-existent email: ${email}`);
     throw { status: 400, message: 'Email is incorrect' };
   }
 
   // Ensure OTP exists in the user document
   if (!user.resetPasswordOtp || !user.otpExpires) {
+    logger.error(`OTP not found for user with email: ${email}`);
     throw { status: 400, message: 'OTP not found or expired' };
   }
 
@@ -111,13 +121,16 @@ const user_resetPassword = async ({
     );
 
     if (!updatedUser) {
+      logger.error(`Failed to update password for user with email: ${email}`);
       throw { status: 500, message: 'Internal error occurred while updating password' };
     }
 
     return { message: 'Password has been successfully reset' };
   } else if (currentTime > user.otpExpires) {
+    logger.warn(`Expired OTP attempt for email: ${email}`);
     throw { status: 400, message: 'OTP has expired' };
   } else {
+    logger.warn(`Invalid OTP attempt for email: ${email}`);
     throw { status: 400, message: 'Invalid OTP' };
   }
 };

@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import logger from './logger';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import UserModel from '../models/users';
 
@@ -14,10 +15,12 @@ export const refreshToken = async (
     const { refresh_tokenId } = req.body;
 
     if (!refresh_tokenId) {
+      logger.info('Refresh token missing in request body');
       return res.status(401).json({ message: 'Refresh Token Missing' });
     }
 
     if (!process.env.JWT_SECRET_TOKEN) {
+      logger.error('JWT secret is not defined in environment variables');
       throw new Error('JWT secret is not defined');
     }
 
@@ -31,6 +34,7 @@ export const refreshToken = async (
     const user = await UserModel.findById(decoded.id);
 
     if (!user || user.refreshToken !== refresh_tokenId) {
+      logger.warn(`Invalid refresh token attempt for user ID: ${decoded.id}`);
       return res.status(403).json({ message: 'Invalid Refresh Token' });
     }
 
@@ -62,7 +66,7 @@ export const refreshToken = async (
     });
 
   } catch (error) {
-    console.error('Refresh token error:', error);
+    logger.error(`Refresh token error:${error}`);
     return res.status(403).json({ message: 'Invalid or Expired Refresh Token' });
   }
 };
