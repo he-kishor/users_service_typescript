@@ -40,8 +40,8 @@ export const authenticate = (
     req.headers.authorization = `Bearer ${token}`;
 
     next();
-  } catch (error) {
-    logger.error(`Token verification failed:${error}`);
+  } catch(error:any) {
+    logger.error(`Token verification failed:${error.message}`);
     return res.status(403).json({ message: 'Invalid token' });
   }
 };
@@ -69,8 +69,8 @@ export const authenticateHeader = (
     req.userId = decoded.id;
 
     next();
-  } catch (error) {
-    logger.error(`Token verification failed:${error}`);
+  } catch(error:any) {
+    logger.error(`Token verification failed:${error.message}`);
     return res.status(403).json({ message: 'Invalid token' });
   }
 };
@@ -98,8 +98,8 @@ export const verifyAccessToken = (
     req.userId = decoded.id;
 
     next();
-  } catch (error) {
-    logger.error(`Access token verification failed:${error}`);
+  } catch(error:any) {
+    logger.error(`Access token verification failed:${error.message}`);
     return res
       .status(403)
       .json({ message: 'Invalid or expired access token' });

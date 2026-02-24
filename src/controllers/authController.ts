@@ -29,8 +29,8 @@ export const checkUserController = async (
     const userData = await check_user(id);
     
     res.status(200).json(userData);
-  } catch (error) {
-    logger.error(`Error checking authenticated user: ${error}`);
+  } catch(error:any) {
+    logger.error(`Error checking authenticated user: ${error.message}`);
     errorHandler(res, error);
   }
 };
@@ -49,8 +49,8 @@ export const apiLoginUserController = async (
     const loginResponse = await loginuser(req.body);
 
     res.status(200).json(loginResponse.user);
-  } catch (error) {
-    logger.error(`API login failed:${ error}`);
+  } catch(error:any) {
+    logger.error(`API login failed:${ error.message}`);
     errorHandler(res, error);
   }
 };

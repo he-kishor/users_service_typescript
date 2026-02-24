@@ -31,8 +31,8 @@ passport.use(
 
         // Call the `done` callback with the user object
         return done(null, user);
-      } catch (error) {
-        logger.error(`Error during Google OAuth authentication:${error}`);
+      } catch(error:any) {
+        logger.error(`Error during Google OAuth authentication:${error.message}`);
         // Call the `done` callback with the error
         return done(error);
       }

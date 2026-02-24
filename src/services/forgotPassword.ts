@@ -61,7 +61,7 @@ const user_forgotpassword = async (email: string): Promise<IForgotPasswordRespon
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
-        logger.error(`Error sending OTP email to ${email}:${error}`);
+        logger.error(`Error sending OTP email to ${email}:${error.message}`);
         return reject({ status: 500, message: 'Issue while sending OTP', error });
       } else {
         logger.info(`OTP email sent successfully to ${email}: ${info.response}`);

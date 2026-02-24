@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import logger from '../utils/logger';
 import passport from 'passport';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import jwt from 'jsonwebtoken';
@@ -48,7 +49,8 @@ passport.use(
         );
 
         return done(null, { user, token });
-      } catch (err) {
+      } catch (err: any) {
+        logger.error(`Google OAuth error: ${err.message}`);
         return done(err, false);
       }
     }
@@ -65,7 +67,8 @@ passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await UserModel.findById(id);
     done(null, user);
-  } catch (error) {
+  } catch(error:any) {
+    logger.error(`Deserialize user error: ${error.message}`);
     done(error, null);
   }
 });

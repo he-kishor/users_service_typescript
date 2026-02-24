@@ -44,7 +44,7 @@ const update_mobilenumber = async (_id: string, mobilenumber: string): Promise<I
       throw { status: 400, message: 'Invalid mobile number format' };
     } else {
 
-      logger.error(`Internal server error:${error}`); // Log the error for debugging
+      logger.error(`Internal server error:${error.message}`); // Log the error for debugging
       throw { status: 500, message: 'An internal error has occurred' };
     }
   }

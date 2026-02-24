@@ -34,8 +34,8 @@ export const userRegister = async (
     const userResponse = await registerUser(req.body);
     res.status(201).json(userResponse);
 
-  } catch (error) {
-    logger.error(`User registration failed:${error}`);
+  } catch(error:any) {
+    logger.error(`User registration failed:${error.message}`);
     errorHandler(res, error);
   }
 };
@@ -63,8 +63,8 @@ export const loginUserController = async (
     });
 
     res.status(200).json(loginResponse.user);
-  } catch (error) {
-    logger.error(`User login failed:${error}`);
+  } catch (error:any) {
+    logger.error(`User login failed:${error.message}`);
     errorHandler(res, error);
   }
 };
@@ -90,8 +90,8 @@ export const updateUserController = async (
     const updatedUser = await updateUser(id, req.body);
 
     res.status(200).json(updatedUser);
-  } catch (error) {
-    logger.error(`User update failed:${error}`);
+  } catch(error:any) {
+    logger.error(`User update failed:${error.message}`);
     errorHandler(res, error);
   }
 };
@@ -117,8 +117,8 @@ export const updatePasswordController = async (
     const message = await updatePassword(id, req.body);
 
     res.status(200).json(message);
-  } catch (error) {
-    logger.error(`Password update failed:${error}`);
+  } catch(error:any) {
+    logger.error(`Password update failed:${error.message}`);
     errorHandler(res, error);
   }
 };
@@ -144,8 +144,8 @@ export const forgotPasswordController = async (
     const response = await user_forgotpassword(email);
 
     res.status(200).json(response);
-  } catch (error) {
-    logger.error(`Forgot password process failed:${error}`);
+  } catch(error:any) {
+    logger.error(`Forgot password process failed:${error.message}`);
     errorHandler(res, error);
   }
 };
@@ -169,8 +169,8 @@ export const resetPasswordController = async (
     });
 
     res.status(200).json(response);
-  } catch (error) {
-    logger.error(`Password reset process failed:${error} `);
+  } catch(error:any) {
+    logger.error(`Password reset process failed:${error.message} `);
     errorHandler(res, error);
   }
 };
@@ -203,8 +203,8 @@ export const updateMobileNumberController = async (
     const response = await update_mobilenumber(id , mobilenumber);
 
     res.status(200).json(response);
-  } catch (error) {
-    logger.error(`Mobile number update process failed:${error}`);
+  } catch(error:any) {
+    logger.error(`Mobile number update process failed:${error.message}`);
     errorHandler(res, error);
   }
 };

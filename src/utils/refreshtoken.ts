@@ -65,8 +65,8 @@ export const refreshToken = async (
       newrefreshToken: newRefreshToken
     });
 
-  } catch (error) {
-    logger.error(`Refresh token error:${error}`);
+  } catch(error:any) {
+    logger.error(`Refresh token error:${error.message}`);
     return res.status(403).json({ message: 'Invalid or Expired Refresh Token' });
   }
 };
