@@ -1,14 +1,13 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import express from 'express';
-import  {connectDB} from './db/dbconnect';
+import passport from 'passport';
+import './config/passport';        // ✅ keep only if this re-exports from services/passport
+import { connectDB } from './db/dbconnect';
 import Routes from './routes/route';
 import { logger } from './middlewares/middleware';
 import session from 'express-session';
-import passport from 'passport';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import passportData from './services/passport';
-import dotenv from 'dotenv';
 
 dotenv.config();
 

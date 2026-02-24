@@ -55,10 +55,12 @@ passport.use(
   )
 );
 
-passport.serializeUser((user: any, done) => {
-  done(null, user._id);
+// ✅ Fix serializeUser - the object passed to done() is { user, token }
+passport.serializeUser((data: any, done) => {
+  done(null, data.user._id);  // ← access data.user._id not data._id
 });
 
+// ✅ Fix deserializeUser accordingly
 passport.deserializeUser(async (id: string, done) => {
   try {
     const user = await UserModel.findById(id);

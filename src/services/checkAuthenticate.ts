@@ -52,14 +52,14 @@ const loginuser = async ({ email, pass }: ILoginRequest): Promise<ILoginResponse
   // Generate JWT token
   const token = jwt.sign(
     { id: user._id, email: user.email, role: user.role } as unknown as IJwtPayload,
-    process.env.jwtsecrettoken || '',
+    process.env.JWT_SECRET || '',
     { expiresIn: '4h' }
   );
 
   // Generate refresh token
   const refreshTokenn = jwt.sign(
     { id: user._id },
-    process.env.jwtsecrettoken || '',
+    process.env.JWT_SECRET || '',
     { expiresIn: '30d' } // Set a longer expiration for the refresh token
   );
 
