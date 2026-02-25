@@ -26,17 +26,17 @@ const router = Router();
 /* ==============================
    Refresh Token
 ============================== */
-router.post('/refreshtoken', refreshToken);
+router.post('/refresh-token', refreshToken);
 
 /* ==============================
    Check Authenticated User
 ============================== */
-router.get('/check_user', authenticateHeader, checkUserController);
+router.get('/check-user', authenticateHeader, checkUserController);
 
 /* ==============================
    API Login (Header Based)
 ============================== */
-router.post('/apilogin', apiLoginUserController);
+router.post('/api-login', apiLoginUserController);
 
 /* ==============================
    User Authentication
@@ -47,18 +47,18 @@ router.post('/login', loginUserController);
 /* ==============================
    Update User
 ============================== */
-router.put('/updateusers', authenticate, updateUserController);
-router.put('/updatepassword', authenticate, updatePasswordController);
+router.put('/update-users', authenticate, updateUserController);
+router.put('/update-password', authenticate, updatePasswordController);
 
 /* ==============================
    Forgot & Reset Password
 ============================== */
-router.post('/forgotpasswords', forgotPasswordController);
-router.post('/resetpasswordotps', resetPasswordController);
+router.post('/forgot-passwords', forgotPasswordController);
+router.post('/reset-password-otps', resetPasswordController);
 
 /* ==============================
    Update Mobile Number
 ============================== */
-router.put('/updatemobile', authenticate, updateMobileNumberController);
+router.put('/update-mobile', authenticate, updateMobileNumberController);
 
 export default router;

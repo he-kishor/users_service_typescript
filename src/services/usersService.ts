@@ -139,18 +139,21 @@ export const loginUser = async ({ email, pass }: LoginInput) => {
 
 interface UpdateInput {
   email: string;
-  fname: string;
-  lname: string;
-  gender: string;
+  fname?: string;
+  lname?: string;
+  gender?: string;
+  dob?: Date;
+  weight?: number; //kg
+  height?: number; //cm
 }
 
 export const updateUser = async (
   id: string | Types.ObjectId,
   body: UpdateInput
 ) => {
-  const { email, fname, lname, gender } = body;
+  const { email, fname, lname, gender, dob, weight, height } = body;
 
-  if (!email || !fname || !lname || !gender) {
+  if (!email) {
     logger.warn(`User update attempt with missing fields for user ID: ${id}: ${JSON.stringify({ email, fname, lname, gender })}`);
     throw {
       status: 400,
@@ -158,13 +161,29 @@ export const updateUser = async (
     };
   }
 
-  const updatedUser = await UserModel.findByIdAndUpdate(
-    id,
-    {
-      $set: { fname, lname, gender }
-    },
-    { new: true }
-  );
+  // Build update object dynamically — only include fields that have real values
+    // Skips: undefined, null, "", 0, false
+    const updateFields: Record<string, any> = {};
+
+    if (fname)   updateFields.fname  = fname;
+    if (lname)   updateFields.lname  = lname;
+    if (gender)  updateFields.gender = gender;
+    if (dob)     updateFields.dob    = dob;
+    if (weight)  updateFields.weight = weight;
+    if (height)  updateFields.height = height;
+
+    if (Object.keys(updateFields).length === 0) {
+      throw {
+        status: 400,
+        message: 'No valid fields provided to update'
+      };
+    }
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      id,
+      { $set: updateFields },
+      { new: true }
+    );
 
   if (!updatedUser) {
     logger.warn(`User update attempt for non-existent user ID: ${id}`);
@@ -177,7 +196,11 @@ export const updateUser = async (
     fname: updatedUser.fname,
     lname: updatedUser.lname,
     role: updatedUser.role,
-    gender: updatedUser.gender
+    gender: updatedUser.gender,
+    dob: updatedUser.dob,
+    weight: updatedUser.weight,
+    height: updatedUser.height
+    
   };
 };
 

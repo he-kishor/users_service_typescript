@@ -15,6 +15,9 @@ export interface IUser {
   resetPasswordOtp?: string | null;
   otpExpires?: Date | null;
   refreshToken?: string | null;
+  dob?: Date | null;
+  weight?: number | null; //kg
+  height?: number | null; //cm
 }
 
 // 1. Pass <IUser> to the Schema constructor
@@ -32,7 +35,10 @@ const userSchema = new Schema<IUser>(
     mobilenumber: { type: String },
     resetPasswordOtp: { type: String },
     otpExpires: { type: Date },
-    refreshToken: { type: String }
+    refreshToken: { type: String },
+    dob: { type: Date },
+    weight: { type: Number }, //kg
+    height: { type: Number } //cm
   }
 );
 
