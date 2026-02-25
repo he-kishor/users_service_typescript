@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
+import logger from '../utils/logger';
 import passport from 'passport';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import jwt from 'jsonwebtoken';
 import UserModel, { IUser } from '../models/users';
+import { userInfo } from 'os';
 
 dotenv.config();
 
@@ -46,26 +48,39 @@ passport.use(
           process.env.JWT_SECRET || '',
           { expiresIn: '4h' }
         );
-
-        return done(null, { user, token });
-      } catch (err) {
+        const userInfo = {
+          message: 'Login Successfully',
+          email: user.email,
+          fname: user.fname,
+          lname: user.lname,
+          role: user.role,
+          lastLoginAt: user.lastLoginAt
+        }
+        return done(null, { user , token});
+      } catch (err: any) {
+        logger.error(`Google OAuth error: ${err.message}`);
         return done(err, false);
       }
     }
   )
 );
 
-passport.serializeUser((user: any, done) => {
-  done(null, user._id);
+// ── Serialize: store only the user ID in the session ─────────────────────────
+passport.serializeUser((data: Express.User, done) => {
+  done(null, data.user._id); // ✅ typed correctly now
 });
 
+// ── Deserialize: pull full user from DB on each request ──────────────────────
 passport.deserializeUser(async (id: string, done) => {
   try {
-    const user = await UserModel.findById(id);
-    done(null, user);
-  } catch(error:any) {
-    done(error, null);
+    const user = await UserModel.findById(id).lean();
+    if (!user) return done(null, false);
+
+    // Rebuild the same shape that serializeUser stored
+    // Token is not re-issued here — client should already hold it
+    done(null, { user, token: '' });
+  } catch (err) {
+    done(err, false);
   }
 });
-
 export default passport;

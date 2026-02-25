@@ -4,6 +4,7 @@ import passport from 'passport';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
 import jwt from 'jsonwebtoken';
 import UserModel, { IUser } from '../models/users';
+import { userInfo } from 'os';
 
 dotenv.config();
 
@@ -47,8 +48,8 @@ passport.use(
           process.env.JWT_SECRET || '',
           { expiresIn: '4h' }
         );
-
-        return done(null, { user, token });
+      
+        return done(null, { user , token});
       } catch (err: any) {
         logger.error(`Google OAuth error: ${err.message}`);
         return done(err, false);
@@ -57,20 +58,23 @@ passport.use(
   )
 );
 
-// ✅ Fix serializeUser - the object passed to done() is { user, token }
+// ── Serialize: store only the user ID in the session ─────────────────────────
 passport.serializeUser((data: any, done) => {
-  done(null, data.user._id);  // ← access data.user._id not data._id
+  done(null, data.user._id); // ✅ typed correctly now
 });
 
-// ✅ Fix deserializeUser accordingly
+
+// ── Deserialize: pull full user from DB on each request ──────────────────────
 passport.deserializeUser(async (id: string, done) => {
   try {
-    const user = await UserModel.findById(id);
-    done(null, user);
-  } catch(error:any) {
-    logger.error(`Deserialize user error: ${error.message}`);
-    done(error, null);
+    const user = await UserModel.findById(id).lean();
+    if (!user) return done(null, false);
+
+    // Rebuild the same shape that serializeUser stored
+    // Token is not re-issued here — client should already hold it
+    done(null, { user, token: '' });
+  } catch (err) {
+    done(err, false);
   }
 });
-
 export default passport;
