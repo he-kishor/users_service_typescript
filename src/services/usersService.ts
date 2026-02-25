@@ -35,6 +35,10 @@ export const registerUser = async ({
     throw { status: 400, message: 'Please provide all required fields' };
   }
 
+  if (role == 'admin') {
+    logger.warn(`User registration attempt with role 'admin' for email: ${email}`);
+    throw { status: 400, message: " Invalid role" };
+  }
   const hashedPassword = await bcrypt.hash(pass, 10);
 
   const newUser = await UserModel.create({
