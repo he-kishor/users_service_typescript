@@ -1,4 +1,4 @@
-# 🚀 Fitness AI - User Microservice 🚀
+# 🚀 User Microservice 🚀
 
 I have developed the Users Microservice in TypeScript which you can add to any project where you don't want to handle user stuff and just need to focus on the core features. 
 
